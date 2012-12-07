@@ -1,0 +1,18 @@
+;;;  -*- Hen -*-
+
+((egg "AD.egg")
+ (category math)
+ (author "Jeffrey Mark Siskind")
+ (maintainer "Andrei Barbu")
+ (license "GPL")
+ (doc-from-wiki)
+ (synopsis "AD operators")
+ (depends
+  (setup-helper "1.5.2")
+  (define-structure "1.0")
+  (traversal "1.0"))
+ (test-depends test)
+ (files "AD.meta" 
+        "AD.release-info"
+        "AD.scm" 
+        "AD.setup"))

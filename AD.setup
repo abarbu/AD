@@ -1,0 +1,9 @@
+;;;  -*- Hen -*-
+
+(use setup-helper-mod)
+
+(verify-extension-name "AD")
+
+(setup-shared-extension-module 'AD (extension-version "1.0")
+  #:inline? #t #:types? #t
+  #:compile-options '(-O3 -keep-shadowed-macros -d2))
