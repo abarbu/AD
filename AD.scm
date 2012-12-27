@@ -129,27 +129,27 @@
 (define-syntax AD#=
  (syntax-rules ()
   ((_ a b) (=-two a b))
-  ((_ a b c ...) (=-two a (= b c ...)))))
+  ((_ a b c ...) (and (= b c ...) (=-two a b)))))
 
 (define-syntax AD#<
  (syntax-rules ()
   ((_ a b) (<-two a b))
-  ((_ a b c ...) (<-two a (< b c ...)))))
+  ((_ a b c ...) (and (< b c ...) (<-two a b)))))
 
 (define-syntax AD#>
  (syntax-rules ()
   ((_ a b) (>-two a b))
-  ((_ a b c ...) (>-two a (> b c ...)))))
+  ((_ a b c ...) (and (> b c ...) (>-two a b)))))
 
 (define-syntax AD#<=
  (syntax-rules ()
   ((_ a b) (<=-two a b))
-  ((_ a b c ...) (<=-two a (<= b c ...)))))
+  ((_ a b c ...) (and (<= b c ...) (<=-two a b)))))
 
 (define-syntax AD#>=
  (syntax-rules ()
   ((_ a b) (>=-two a b))
-  ((_ a b c ...) (>=-two a (>= b c ...)))))
+  ((_ a b c ...) (and (>= b c ...) (>=-two a b)))))
 
 ;;;
 
