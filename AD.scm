@@ -1,27 +1,25 @@
 (module AD
-*
-;; We use * because I don't know how to export records
-;;
-;; ( ;; Lifted procedures
-;;  + AD#+ - AD#- * AD#* / AD#/ = AD#= > AD#> < AD#< >= AD#>= <= AD#<=
-;;  add1 sub1 signum
-;;  exp log sin cos ;; TODO tan
-;;  atan            ;; TODO acos asin
-;;  expt sqrt
-;;  ;; TODO quotient modulo remainder numerator denominator
-;;  abs max min ;; TODO: gcd lcm
-;;  positive? negative? odd? even? zero?
-;;  real? exact? inexact?
-;;  ;; TODO: floor ceiling truncate round
-;;  inexact->exact exact->inexact
-;;  finite?
-;;  ;; Other procedures
-;;  lift-real*real->real lift-real->real
-;;  derivative-F gradient-F
-;;  gradient-R derivative-R
-;;  ;; low-level, dual&tape structs
-;;  determine-fanout! reverse-phase! write-real
-;; )
+ ( ;; Lifted procedures
+  + AD#+ - AD#- * AD#* / AD#/ = AD#= > AD#> < AD#< >= AD#>= <= AD#<=
+  +-two --two *-two /-two =-two >-two <-two >=-two <=-two
+  add1 sub1 signum
+  exp log sin cos ;; TODO tan
+  atan            ;; TODO acos asin
+  expt sqrt
+  ;; TODO quotient modulo remainder numerator denominator
+  abs max min ;; TODO: gcd lcm
+  positive? negative? odd? even? zero?
+  real? exact? inexact?
+  ;; TODO: floor ceiling truncate round
+  inexact->exact exact->inexact
+  finite?
+  ;; Other procedures
+  lift-real*real->real lift-real->real
+  derivative-F gradient-F
+  gradient-R derivative-R
+  ;; low-level, dual&tape structs
+  determine-fanout! reverse-phase! write-real
+  )
 
 (import (except scheme
                 + - * / = > < >= <=
