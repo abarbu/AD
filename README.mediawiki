@@ -1,11 +1,11 @@
-= AD =
+
+== AD ==
 
 This is a Chicken Scheme egg which implements automatic
 differentiation by lifitng mathematical operations. This egg uses a
 hack to declare all lifted operations as both a macro and a
 procedure. The macro provides specialization for the two-argument
-case.
-
+case. This package originates in Jeff Siskind's QobiScheme.
 
 ==== Derivatives ====
 
@@ -60,6 +60,9 @@ values for each of the arguments of the original function.
    Copyright 1996 and 1997 University of Vermont. All rights reserved.
    Copyright 1997-2001 NEC Research Institute, Inc. All rights reserved.
    Copyright 2002-2012 Purdue University. All rights reserved.
+
+Contact Andrei Barbu, andrei@0xab.com
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
