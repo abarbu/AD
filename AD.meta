@@ -4,7 +4,7 @@
  (category math)
  (author "Jeffrey Mark Siskind")
  (maintainer "Andrei Barbu")
- (license "GPL")
+ (license "LGPL")
  (doc-from-wiki)
  (synopsis "AD operators")
  (depends
