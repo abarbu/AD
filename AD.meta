@@ -6,11 +6,8 @@
  (maintainer "Andrei Barbu")
  (license "LGPL")
  (doc-from-wiki)
- (synopsis "AD operators")
- (depends
-  (setup-helper "1.5.2")
-  (define-structure "1.0")
-  (traversal "1.0"))
+ (synopsis "Performs automatic differentiation")
+ (depends setup-helper define-structure traversal)
  (test-depends test)
  (files "AD.meta" 
         "AD.release-info"
