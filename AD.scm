@@ -42,6 +42,18 @@
         foreign
         extras)
 
+;; These cannot all be inlined, for example / and /-two mutually recurse
+;; and sqrt recurses. As of 4.8.0.2 this causes the chicken
+;; inliner to loop indefinitely.
+;;   + - * / = > < <= >=
+;;   sqrt exp log sin cos atan
+(declare (inline +-two --two *-two /-two
+                 =-two >-two <-two <=-two >=-two
+                 zero? positive? negative? real?
+                 exact? inexact? finite? odd? even?
+                 abs max min add1 sub1 signum
+                 inexact->exact exact->inexact))
+
 (use traversal srfi-1)
 
 (define (zero? x)
@@ -270,7 +282,10 @@
 
 (define (/-two x1 x2)
  (if (and (number? x1) (number? x2))
-     (old-/ x1 x2)
+     ;; We pay a performance penalty because chicken is broken
+     (if (= x2 0.0)
+         (fp/ (exact->inexact x1) (exact->inexact x2))
+         (old-/ x1 x2))
      (lift-real*real->real old-/
                            (lambda (x1 x2) (/ x2))
                            (lambda (x1 x2) (- (/ x1 (* x2 x2))))
@@ -379,14 +394,18 @@
 (define (max a b) (if (> a b) a b))
 (define (min a b) (if (< a b) a b))
 
-(define add1 (lambda (n) (+ n 1)))
-(define sub1 (lambda (n) (- n 1)))
+(define (add1 n) (+ n 1))
+(define (sub1 n) (- n 1))
 (define (signum x) (if (= x 0) 0 (if (< x 0) -1 1)))
 
 (define (inexact->exact x) 
- (lift-real->real old-inexact->exact (lambda (x) x) x))
+ (if (number? x)
+     (old-inexact->exact x)
+     (lift-real->real old-inexact->exact (lambda (x) x) x)))
 (define (exact->inexact x) 
- (lift-real->real old-exact->inexact (lambda (x) x) x))
+ (if (number? x)
+     (old-exact->inexact x)
+     (lift-real->real old-exact->inexact (lambda (x) x) x)))
 
 (define (derivative-F f)
  (lambda (x)
