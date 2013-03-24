@@ -42,6 +42,49 @@
         foreign
         extras)
 
+#>
+#define WORDS_PER_FLONUM C_SIZEOF_FLONUM
+#define AD_a_i_divide(ptr, n, x, y)      AD_2_divide(ptr, x, y)
+
+C_regparm C_word C_fcall AD_2_divide(C_word **ptr, C_word x, C_word y)
+{
+  C_word iresult;
+  double fresult;
+  int fflag = 0;
+
+  if(x & C_FIXNUM_BIT) {
+    if(y & C_FIXNUM_BIT) {
+      fresult = (double)C_unfix(x) / (double)iresult;
+      iresult = C_unfix(x) / iresult;
+    }
+    else if(!C_immediatep(y) && C_block_header(y) == C_FLONUM_TAG) {
+      fresult = (double)C_unfix(x) / fresult;
+      fflag = 1;
+    }
+    else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", y);
+  }
+  else if(!C_immediatep(x) && C_block_header(x) == C_FLONUM_TAG) {
+    fflag = 1;
+
+    if(y & C_FIXNUM_BIT) {
+      fresult = C_flonum_magnitude(x);
+      fresult = fresult / (double)iresult;
+    }
+    else if(!C_immediatep(y) && C_block_header(y) == C_FLONUM_TAG) {
+      fresult = C_flonum_magnitude(x) / fresult;
+    }
+    else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", y);
+  }
+  else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", x);
+
+  iresult = C_fix(iresult);
+
+  if(fflag || (double)C_unfix(iresult) != fresult) return C_flonum(ptr, fresult);
+  
+  return iresult;
+}
+<#
+
 (use traversal srfi-1)
 
 ;; These cannot all be inlined, for example / and /-two mutually recurse
@@ -49,7 +92,9 @@
 ;; inliner to loop indefinitely.
 ;;   + - * / = > < <= >=
 ;;   sqrt exp log sin cos atan
-(declare (inline +-two --two *-two /-two
+(declare (inline +-two --two *-two
+                 ;; /-two can't be inlined because of 
+                 ;; 
                  =-two >-two <-two <=-two >=-two
                  zero? positive? negative? real?
                  exact? inexact? finite? odd? even?
@@ -320,10 +365,7 @@
 
 (define (/-two x1 x2)
  (if (and (number? x1) (number? x2))
-     ;; We pay a performance penalty because chicken is broken
-     (if (= x2 0.0)
-         (fp/ (exact->inexact x1) (exact->inexact x2))
-         (old-/ x1 x2))
+     (##core#inline_allocate ("AD_a_i_divide" 4) x1 x2)
      (lift-real*real->real old-/
                            (lambda (x1 x2) (/ x2))
                            (lambda (x1 x2) (- (/ x1 (* x2 x2))))
