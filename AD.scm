@@ -42,6 +42,8 @@
         foreign
         extras)
 
+(use traversal srfi-1)
+
 ;; These cannot all be inlined, for example / and /-two mutually recurse
 ;; and sqrt recurses. As of 4.8.0.2 this causes the chicken
 ;; inliner to loop indefinitely.
@@ -54,7 +56,43 @@
                  abs max min add1 sub1 signum
                  inexact->exact exact->inexact))
 
-(use traversal srfi-1)
+(define-type AD-number (or number (struct tape) (struct dual-number)))
+
+(: +-two (AD-number AD-number -> AD-number))
+(: --two (AD-number AD-number -> AD-number))
+(: *-two (AD-number AD-number -> AD-number))
+(: /-two (AD-number AD-number -> AD-number))
+(: =-two (AD-number AD-number -> boolean))
+(: >-two (AD-number AD-number -> boolean))
+(: <-two (AD-number AD-number -> boolean))
+(: <=-two (AD-number AD-number -> boolean))
+(: >=-two (AD-number AD-number -> boolean))
+(: min (AD-number AD-number -> AD-number))
+(: max (AD-number AD-number -> AD-number))
+(: atan (AD-number AD-number -> AD-number))
+(: expt (AD-number AD-number -> AD-number))
+
+(: abs (AD-number -> AD-number))
+(: add1 (AD-number -> AD-number))
+(: sub1 (AD-number -> AD-number))
+(: signum (AD-number -> number))
+(: inexact->exact (AD-number -> AD-number))
+(: exact->inexact (AD-number -> AD-number))
+(: exp (AD-number -> AD-number))
+(: log (AD-number -> AD-number))
+(: sin (AD-number -> AD-number))
+(: cos (AD-number -> AD-number))
+(: sqrt (AD-number -> AD-number))
+
+(: zero? (AD-number -> boolean))
+(: positive? (AD-number -> boolean))
+(: negative? (AD-number -> boolean))
+(: real? (AD-number -> boolean))
+(: exact? (AD-number -> boolean))
+(: inexact? (AD-number -> boolean))
+(: finite? (AD-number -> boolean))
+(: odd? (AD-number -> boolean))
+(: even? (AD-number -> boolean))
 
 (define (zero? x)
  (if (number? x)
