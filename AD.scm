@@ -46,19 +46,58 @@
 #define WORDS_PER_FLONUM C_SIZEOF_FLONUM
 #define AD_a_i_divide(ptr, n, x, y)      AD_2_divide(ptr, x, y)
 
+void barf(int code, char *loc, ...)
+{
+  C_char *msg;
+  C_word err = C_intern2(C_heaptop, C_text("\003syserror-hook"));
+  int c, i;
+  va_list v;
+
+  C_dbg_hook(C_SCHEME_UNDEFINED);
+
+  C_temporary_stack = C_temporary_stack_bottom;
+  err = C_u_i_car(err);
+
+  switch(code) {
+  case C_BAD_ARGUMENT_TYPE_ERROR:
+    msg = C_text("bad argument type");
+    c = 1;
+    break;
+  default:
+    fprintf(stderr, "illegal internal error code");
+    exit(1);
+  }
+  
+  C_save(C_fix(code));
+  
+  if(loc != NULL)
+    C_save(C_intern2(C_heaptop, loc));
+  else {
+    C_save(C_SCHEME_FALSE);
+  }
+  
+  va_start(v, loc);
+  i = c;
+   while(i--)
+    C_save(va_arg(v, C_word));
+  va_end(v);
+
+  /* No continuation is passed: '##sys#error-hook' may not return: */
+  C_do_apply(c + 2, err, C_SCHEME_UNDEFINED); 
+}
+
 C_regparm C_word C_fcall AD_2_divide(C_word **ptr, C_word x, C_word y)
 {
   C_word iresult;
   double fresult;
   int fflag = 0;
-
   if(x & C_FIXNUM_BIT) {
     if(y & C_FIXNUM_BIT) {
-      fresult = (double)C_unfix(x) / (double)iresult;
-      iresult = C_unfix(x) / iresult;
+      fresult = (double)C_unfix(x) / (double)C_unfix(y);
+      iresult = C_unfix(x) / C_unfix(y);
     }
     else if(!C_immediatep(y) && C_block_header(y) == C_FLONUM_TAG) {
-      fresult = (double)C_unfix(x) / fresult;
+      fresult = (double)C_unfix(x) / C_flonum_magnitude(y);
       fflag = 1;
     }
     else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", y);
@@ -67,11 +106,10 @@ C_regparm C_word C_fcall AD_2_divide(C_word **ptr, C_word x, C_word y)
     fflag = 1;
 
     if(y & C_FIXNUM_BIT) {
-      fresult = C_flonum_magnitude(x);
-      fresult = fresult / (double)iresult;
+      fresult = C_flonum_magnitude(x) / (double)C_unfix(y);
     }
     else if(!C_immediatep(y) && C_block_header(y) == C_FLONUM_TAG) {
-      fresult = C_flonum_magnitude(x) / fresult;
+      fresult = C_flonum_magnitude(x) / C_flonum_magnitude(y);
     }
     else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", y);
   }
