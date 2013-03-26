@@ -4,6 +4,6 @@
 
 (verify-extension-name "AD")
 
-(setup-shared-extension-module 'AD (extension-version "1.3")
+(setup-shared-extension-module 'AD (extension-version "1.4")
   #:inline? #t #:types? #t
-  #:compile-options '(-O3 -keep-shadowed-macros -d2))
+  #:compile-options '(-O3 -keep-shadowed-macros -d2 -C -Wall -C -Wno-unused-but-set-variable -C -Wno-unused-variable))

@@ -88,38 +88,29 @@ void barf(int code, char *loc, ...)
 
 C_regparm C_word C_fcall AD_2_divide(C_word **ptr, C_word x, C_word y)
 {
-  C_word iresult;
-  double fresult;
-  int fflag = 0;
   if(x & C_FIXNUM_BIT) {
     if(y & C_FIXNUM_BIT) {
-      fresult = (double)C_unfix(x) / (double)C_unfix(y);
-      iresult = C_unfix(x) / C_unfix(y);
+      double fresult = (double)C_unfix(x) / (double)C_unfix(y);
+      C_word iresult = C_unfix(x) / C_unfix(y);
+      if((double)C_unfix(iresult) != fresult) return C_flonum(ptr, fresult);
     }
     else if(!C_immediatep(y) && C_block_header(y) == C_FLONUM_TAG) {
-      fresult = (double)C_unfix(x) / C_flonum_magnitude(y);
-      fflag = 1;
+      return C_flonum(ptr, (double)C_unfix(x) / C_flonum_magnitude(y));
     }
     else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", y);
   }
   else if(!C_immediatep(x) && C_block_header(x) == C_FLONUM_TAG) {
-    fflag = 1;
-
     if(y & C_FIXNUM_BIT) {
-      fresult = C_flonum_magnitude(x) / (double)C_unfix(y);
+      return C_flonum(ptr, C_flonum_magnitude(x) / (double)C_unfix(y));
     }
     else if(!C_immediatep(y) && C_block_header(y) == C_FLONUM_TAG) {
-      fresult = C_flonum_magnitude(x) / C_flonum_magnitude(y);
+      return C_flonum(ptr, C_flonum_magnitude(x) / C_flonum_magnitude(y));
     }
     else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", y);
   }
   else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", x);
 
-  iresult = C_fix(iresult);
-
-  if(fflag || (double)C_unfix(iresult) != fresult) return C_flonum(ptr, fresult);
-  
-  return iresult;
+  exit(-1); /* should never get here */
 }
 <#
 
