@@ -19,7 +19,7 @@
   gradient-R derivative-R
   ;; low-level, dual&tape structs
   determine-fanout! reverse-phase! write-real
-  )
+  *e* <_e tape)
 
 (import (except scheme
                 + - * / = > < >= <=
@@ -91,8 +91,13 @@ C_regparm C_word C_fcall AD_2_divide(C_word **ptr, C_word x, C_word y)
   if(x & C_FIXNUM_BIT) {
     if(y & C_FIXNUM_BIT) {
       double fresult = (double)C_unfix(x) / (double)C_unfix(y);
-      C_word iresult = C_unfix(x) / C_unfix(y);
-      if((double)C_unfix(iresult) != fresult) return C_flonum(ptr, fresult);
+      if(isfinite(fresult)) {
+        C_word iresult = C_unfix(x) / C_unfix(y);
+        if((double)iresult != fresult) return C_flonum(ptr, fresult);
+        else return C_fix(iresult);
+      } else {
+        return C_flonum(ptr, fresult);
+      }
     }
     else if(!C_immediatep(y) && C_block_header(y) == C_FLONUM_TAG) {
       return C_flonum(ptr, (double)C_unfix(x) / C_flonum_magnitude(y));
@@ -110,7 +115,7 @@ C_regparm C_word C_fcall AD_2_divide(C_word **ptr, C_word x, C_word y)
   }
   else barf(C_BAD_ARGUMENT_TYPE_ERROR, "/", x);
 
-  exit(-1); /* should never get here */
+  abort(); /* should never get here */
 }
 <#
 
