@@ -43,6 +43,11 @@
         extras)
 
 #>
+/* argvector chicken starts with version 8 */
+#if C_BINARY_VERSION >= 8
+# define ARGVECTOR_CHICKEN
+#endif
+
 #define WORDS_PER_FLONUM C_SIZEOF_FLONUM
 #define AD_a_i_divide(ptr, n, x, y)      AD_2_divide(ptr, x, y)
 
@@ -68,6 +73,30 @@ void barf(int code, char *loc, ...)
     exit(1);
   }
   
+#ifdef ARGVECTOR_CHICKEN
+  {
+    C_word *av = C_alloc(c + 4);
+
+    av[ 0 ] = err;
+    /* No continuation is passed: '##sys#error-hook' may not return: */
+    av[ 1 ] = C_SCHEME_UNDEFINED;
+    av[ 2 ] = C_fix(code);
+    if(loc != NULL)
+      av[ 3 ] = C_intern2(C_heaptop, loc);
+    else {
+      av[ 3 ] = C_SCHEME_FALSE;
+    }
+
+    av[ 3 ] = loc == NULL ? C_SCHEME_FALSE : C_intern2(C_heaptop, loc);
+
+    va_start(v, loc);
+    for(i = 0; i < c; ++i)
+      av[ i + 4 ] = va_arg(v, C_word);
+    va_end(v);
+
+    C_do_apply(c + 4, av);
+  }
+#else
   C_save(C_fix(code));
   
   if(loc != NULL)
@@ -84,6 +113,7 @@ void barf(int code, char *loc, ...)
 
   /* No continuation is passed: '##sys#error-hook' may not return: */
   C_do_apply(c + 2, err, C_SCHEME_UNDEFINED); 
+#endif
 }
 
 C_regparm C_word C_fcall AD_2_divide(C_word **ptr, C_word x, C_word y)
