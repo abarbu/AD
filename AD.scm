@@ -32,8 +32,7 @@
                 positive? negative? odd? even? zero?
                 real? exact? inexact?
                 ;; floor ceiling truncate round
-                inexact->exact exact->inexact
-                finite?)
+                inexact->exact exact->inexact)
         (except chicken add1 sub1 signum 
                 finite? )
         (prefix scheme old-)
